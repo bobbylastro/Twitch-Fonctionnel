@@ -1,0 +1,113 @@
+{
+  "usableSessionsCount": 2,
+  "retiredSessionsCount": 0,
+  "sessions": [
+    {
+      "id": "session_9tvCc1qsiJ",
+      "cookieJar": {
+        "version": "tough-cookie@5.1.2",
+        "storeType": "MemoryCookieStore",
+        "rejectPublicSuffixes": true,
+        "enableLooseMode": false,
+        "allowSpecialUseDomain": true,
+        "prefixSecurity": "silent",
+        "cookies": []
+      },
+      "userData": {},
+      "maxErrorScore": 3,
+      "errorScoreDecrement": 0.5,
+      "expiresAt": "2025-04-25T13:32:47.750Z",
+      "createdAt": "2025-04-25T12:42:47.750Z",
+      "usageCount": 0,
+      "maxUsageCount": 50,
+      "errorScore": 0
+    },
+    {
+      "id": "session_XXLufTZx9C",
+      "cookieJar": {
+        "version": "tough-cookie@5.1.2",
+        "storeType": "MemoryCookieStore",
+        "rejectPublicSuffixes": true,
+        "enableLooseMode": false,
+        "allowSpecialUseDomain": true,
+        "prefixSecurity": "silent",
+        "cookies": [
+          {
+            "key": "server_session_id",
+            "value": "a3540c1cb44b49da8410d221e162ecd5",
+            "expires": "2025-04-25T13:32:53.062Z",
+            "domain": "twitch.tv",
+            "path": "/",
+            "secure": true,
+            "hostOnly": false,
+            "creation": "2025-04-25T12:42:53.065Z",
+            "lastAccessed": "2025-04-25T12:42:53.065Z"
+          },
+          {
+            "key": "unique_id",
+            "value": "hXEZ6mZRcTa6AOKhjuQXf7NBtoNHle3F",
+            "expires": "2026-05-25T12:42:48.069Z",
+            "domain": "twitch.tv",
+            "path": "/",
+            "secure": true,
+            "hostOnly": false,
+            "creation": "2025-04-25T12:42:53.071Z",
+            "lastAccessed": "2025-04-25T12:42:53.071Z"
+          },
+          {
+            "key": "unique_id_durable",
+            "value": "hXEZ6mZRcTa6AOKhjuQXf7NBtoNHle3F",
+            "expires": "2026-05-25T12:42:48.069Z",
+            "domain": "twitch.tv",
+            "path": "/",
+            "secure": true,
+            "httpOnly": true,
+            "hostOnly": false,
+            "creation": "2025-04-25T12:42:53.073Z",
+            "lastAccessed": "2025-04-25T12:42:53.073Z"
+          },
+          {
+            "key": "twitch.lohp.countryCode",
+            "value": "GB",
+            "expires": "2026-05-20T12:42:48.069Z",
+            "domain": "twitch.tv",
+            "path": "/",
+            "hostOnly": false,
+            "creation": "2025-04-25T12:42:53.073Z",
+            "lastAccessed": "2025-04-25T12:42:53.073Z"
+          },
+          {
+            "key": "experiment_overrides",
+            "value": "{%22experiments%22:{}%2C%22disabled%22:[]}",
+            "expires": "2026-05-25T12:42:48.000Z",
+            "domain": "twitch.tv",
+            "path": "/",
+            "secure": true,
+            "hostOnly": false,
+            "creation": "2025-04-25T12:42:53.073Z",
+            "lastAccessed": "2025-04-25T12:42:53.073Z"
+          },
+          {
+            "key": "api_token",
+            "value": "twilight.f13a6f0c6ec043addf145292d129bc33",
+            "expires": "2026-05-25T12:42:48.000Z",
+            "domain": "twitch.tv",
+            "path": "/",
+            "secure": true,
+            "hostOnly": false,
+            "creation": "2025-04-25T12:42:53.073Z",
+            "lastAccessed": "2025-04-25T12:42:53.073Z"
+          }
+        ]
+      },
+      "userData": {},
+      "maxErrorScore": 3,
+      "errorScoreDecrement": 0.5,
+      "expiresAt": "2025-04-25T13:32:47.754Z",
+      "createdAt": "2025-04-25T12:42:47.754Z",
+      "usageCount": 1,
+      "maxUsageCount": 50,
+      "errorScore": 0
+    }
+  ]
+}

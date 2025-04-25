@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "crawlee": "^3.13.2",
+    "express": "^5.1.0",
+    "playwright": "^1.52.0"
+  }
+}
