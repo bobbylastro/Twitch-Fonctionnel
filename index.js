@@ -1,8 +1,9 @@
-const { PlaywrightCrawler, Dataset } = require("crawlee");
+const { PlaywrightCrawler } = require("crawlee");
 const express = require("express");
 
 async function crawlClip(clipUrl) {
     const startUrls = [clipUrl];
+    let finalVideoUrl = null;
 
     const crawler = new PlaywrightCrawler({
         headless: true,
@@ -25,43 +26,37 @@ async function crawlClip(clipUrl) {
             }
 
             await page.waitForFunction(() => document.querySelector("video")?.src, { timeout: 15000 });
-            let videoUrl = await page.$eval("video", (video) => video.src).catch(() => null);
+            finalVideoUrl = await page.$eval("video", (video) => video.src).catch(() => null);
 
-            if (!videoUrl) {
+            if (!finalVideoUrl) {
                 log.info("No video found in main page, checking iframes...");
                 for (const frame of page.frames()) {
                     try {
-                        videoUrl = await frame.$eval("video", (video) => video.src);
-                        if (videoUrl) {
-                            log.info(`Video found in iframe: ${videoUrl}`);
+                        finalVideoUrl = await frame.$eval("video", (video) => video.src);
+                        if (finalVideoUrl) {
+                            log.info(`Video found in iframe: ${finalVideoUrl}`);
                             break;
                         }
                     } catch (_) {}
                 }
             }
 
-            if (!videoUrl) {
+            if (!finalVideoUrl) {
                 log.info("No video found in DOM, intercepting network requests...");
                 page.on("response", async (response) => {
                     if (response.request().resourceType() === "media") {
                         const url = response.url();
                         log.info(`Detected media URL: ${url}`);
-                        videoUrl = url;
+                        finalVideoUrl = url;
                     }
                 });
                 await page.waitForTimeout(5000);
-            }
-
-            if (videoUrl) {
-                log.info(`Clip URL: ${videoUrl}`);
-                await Dataset.pushData({ url: request.url, videoUrl });
-            } else {
-                log.warn(`No video URL found for ${request.url}`);
             }
         },
     });
 
     await crawler.run(startUrls);
+    return finalVideoUrl;
 }
 
 // --- Partie CLI (si lancé avec un argument)
@@ -72,9 +67,13 @@ if (require.main === module) {
         process.exit(1);
     }
 
-    crawlClip(clipUrl).catch(console.error);
+    crawlClip(clipUrl)
+        .then((videoUrl) => {
+            console.log("Found video URL:", videoUrl);
+        })
+        .catch(console.error);
 } else {
-    // --- Partie API Express (si importé ou démarré comme serveur)
+    // --- Partie API Express
     const app = express();
     app.use(express.json());
 
@@ -85,9 +84,12 @@ if (require.main === module) {
         }
 
         try {
-            await crawlClip(clipUrl);
-            const items = await Dataset.getData();
-            res.json(items.items);
+            const videoUrl = await crawlClip(clipUrl);
+            if (videoUrl) {
+                res.json({ clipUrl, videoUrl });
+            } else {
+                res.status(404).json({ error: "Video not found" });
+            }
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: "Scraping failed" });
