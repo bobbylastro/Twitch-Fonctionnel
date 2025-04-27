@@ -1,7 +1,8 @@
 const { PlaywrightCrawler, Dataset } = require("crawlee");
+const express = require("express");
 
 async function crawlClip(clipUrl) {
-    const startUrls = [clipUrl]; // URL dynamique passée en paramètre
+    const startUrls = [clipUrl];
 
     const crawler = new PlaywrightCrawler({
         headless: true,
@@ -23,11 +24,7 @@ async function crawlClip(clipUrl) {
                 console.log("Pas de bouton, on continue...");
             }
 
-            await page.waitForFunction(
-                () => document.querySelector("video")?.src,
-                { timeout: 15000 },
-            );
-
+            await page.waitForFunction(() => document.querySelector("video")?.src, { timeout: 15000 });
             let videoUrl = await page.$eval("video", (video) => video.src).catch(() => null);
 
             if (!videoUrl) {
@@ -39,9 +36,7 @@ async function crawlClip(clipUrl) {
                             log.info(`Video found in iframe: ${videoUrl}`);
                             break;
                         }
-                    } catch (error) {
-                        continue;
-                    }
+                    } catch (_) {}
                 }
             }
 
@@ -54,7 +49,6 @@ async function crawlClip(clipUrl) {
                         videoUrl = url;
                     }
                 });
-
                 await page.waitForTimeout(5000);
             }
 
@@ -70,13 +64,37 @@ async function crawlClip(clipUrl) {
     await crawler.run(startUrls);
 }
 
-async function main() {
-    const clipUrl = process.argv[2]; // L'URL du clip en paramètre
+// --- Partie CLI (si lancé avec un argument)
+if (require.main === module) {
+    const clipUrl = process.argv[2];
     if (!clipUrl) {
         console.error("No URL provided!");
-        return;
+        process.exit(1);
     }
-    await crawlClip(clipUrl);
-}
 
-main().catch(console.error);
+    crawlClip(clipUrl).catch(console.error);
+} else {
+    // --- Partie API Express (si importé ou démarré comme serveur)
+    const app = express();
+    app.use(express.json());
+
+    app.post("/scrape", async (req, res) => {
+        const clipUrl = req.body.clipUrl;
+        if (!clipUrl) {
+            return res.status(400).json({ error: "Missing clipUrl in body" });
+        }
+
+        try {
+            await crawlClip(clipUrl);
+            const items = await Dataset.getData();
+            res.json(items.items);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: "Scraping failed" });
+        }
+    });
+
+    app.listen(8080, () => {
+        console.log("Server running on port 8080");
+    });
+}

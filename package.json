@@ -1,6 +1,17 @@
 {
   "dependencies": {
     "crawlee": "^3.13.2",
+    "express": "^5.1.0",
     "playwright": "^1.52.0"
-  }
+  },
+  "name": "twitch-fonctionnel",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }
