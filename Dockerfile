@@ -1,5 +1,12 @@
 FROM node:18
 
+# Télécharger et installer Chromium
+RUN apt-get install -y wget \
+    && wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
+    && apt-get install -y ./google-chrome-stable_current_amd64.deb \
+    && apt-get clean \
+    && rm -f google-chrome-stable_current_amd64.deb
+
 # Installer les dépendances système nécessaires pour Playwright
 RUN apt-get update && apt-get install -y \
     libgtk-4.0-0 \
