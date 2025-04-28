@@ -8,7 +8,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "npx playwright install && node index.js",
+    "start": "npx playwright install --with-deps && node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
