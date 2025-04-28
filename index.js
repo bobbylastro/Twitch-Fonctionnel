@@ -3,6 +3,7 @@ const express = require("express");
 
 async function crawlClip(clipUrl) {
     const startUrls = [clipUrl];
+    let lastVideoUrl = null;  // Variable pour stocker la dernière vidéo
 
     const crawler = new PlaywrightCrawler({
         headless: true,
@@ -26,14 +27,14 @@ async function crawlClip(clipUrl) {
             const videoUrl = await page.$eval("video", (video) => video.src).catch(() => null);
 
             if (videoUrl) {
-                // Réinitialisation de la Dataset avant d'ajouter la nouvelle donnée
-                await Dataset.deleteData();  // Supprime les anciennes données
-                await Dataset.pushData({ url: startUrls[0], videoUrl });  // Ajoute uniquement la nouvelle vidéo
+                lastVideoUrl = videoUrl;  // Mettre à jour avec la nouvelle vidéo scrappée
             }
         },
     });
 
     await crawler.run(startUrls);
+
+    return lastVideoUrl;  // Retourner la dernière vidéo après l'exécution du crawler
 }
 
 const app = express();
@@ -53,11 +54,12 @@ app.post("/scrape", (req, res) => {
                 return res.status(400).json({ error: "Missing clipUrl" });
             }
 
-            await crawlClip(clipUrl);
-            const items = await Dataset.getData();
-            
-            // Renvoie seulement la dernière vidéo (c'est le seul élément dans Dataset maintenant)
-            res.json(items.items[items.items.length - 1]);
+            const videoUrl = await crawlClip(clipUrl);  // Scrape la vidéo
+            if (videoUrl) {
+                res.json({ videoUrl });  // Retourne la dernière vidéo
+            } else {
+                res.status(404).json({ error: "No video found" });
+            }
 
         } catch (err) {
             console.error(err);
