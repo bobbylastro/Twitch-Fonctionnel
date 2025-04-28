@@ -3,6 +3,7 @@ const express = require("express");
 
 async function crawlClip(clipUrl) {
     const startUrls = [clipUrl];
+    let lastVideoUrl = null;  // Variable pour stocker uniquement le dernier URL vidéo
 
     const crawler = new PlaywrightCrawler({
         headless: true,
@@ -12,7 +13,7 @@ async function crawlClip(clipUrl) {
             },
         },
         async requestHandler({ page, request, log }) {
-            log.info(Scraping ${request.url});
+            log.info(`Scraping ${request.url}`);
             await page.goto(request.url, { waitUntil: "domcontentloaded" });
 
             const button = await page.$('[data-a-target="content-classification-gate-overlay-start-watching-button"]');
@@ -26,12 +27,13 @@ async function crawlClip(clipUrl) {
             const videoUrl = await page.$eval("video", (video) => video.src).catch(() => null);
 
             if (videoUrl) {
-                await Dataset.pushData({ url: startUrls[0], videoUrl });
+                lastVideoUrl = videoUrl;  // Mettre à jour avec la dernière vidéo
             }
         },
     });
 
     await crawler.run(startUrls);
+    return lastVideoUrl;  // Retourner seulement le dernier URL vidéo trouvé
 }
 
 const app = express();
@@ -39,7 +41,7 @@ app.post("/scrape", (req, res) => {
     let body = "";
 
     req.on("data", chunk => {
-        body += chunk.toString(); // convert Buffer to string
+        body += chunk.toString(); // convertir le Buffer en chaîne de caractères
     });
 
     req.on("end", async () => {
@@ -51,9 +53,13 @@ app.post("/scrape", (req, res) => {
                 return res.status(400).json({ error: "Missing clipUrl" });
             }
 
-            await crawlClip(clipUrl);
-            const items = await Dataset.getData();
-            res.json(items.items);
+            const lastVideoUrl = await crawlClip(clipUrl);  // Scraper la vidéo
+
+            if (lastVideoUrl) {
+                res.json({ videoUrl: lastVideoUrl });  // Retourner uniquement le dernier videoUrl
+            } else {
+                res.status(404).json({ error: "No video found" });
+            }
 
         } catch (err) {
             console.error(err);
