@@ -26,7 +26,9 @@ async function crawlClip(clipUrl) {
             const videoUrl = await page.$eval("video", (video) => video.src).catch(() => null);
 
             if (videoUrl) {
-                await Dataset.pushData({ url: startUrls[0], videoUrl });
+                // Réinitialisation de la Dataset avant d'ajouter la nouvelle donnée
+                await Dataset.deleteData();  // Supprime les anciennes données
+                await Dataset.pushData({ url: startUrls[0], videoUrl });  // Ajoute uniquement la nouvelle vidéo
             }
         },
     });
@@ -53,7 +55,9 @@ app.post("/scrape", (req, res) => {
 
             await crawlClip(clipUrl);
             const items = await Dataset.getData();
-            res.json(items.items);
+            
+            // Renvoie seulement la dernière vidéo (c'est le seul élément dans Dataset maintenant)
+            res.json(items.items[items.items.length - 1]);
 
         } catch (err) {
             console.error(err);
